@@ -1,11 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-img_path = 'img/lena_gray.png'
-
-img = plt.imread(img_path)
-plt.imshow(img, cmap="gray")
-plt.show()
 
 def interpolateLinear(img):
     theta = np.array([[1 / 2, 1 / 2, 0, 0], [0, 0, 1 / 2, 1 / 2]])
@@ -34,9 +29,3 @@ def interpolateLinear(img):
             x_reshaped[1, 2] = x[3, 0]
             interpolated_img[row:row+2, col+j:col+j+3] = x_reshaped
     return interpolated_img
-
-interpolated_img = interpolateLinear(img)
-plt.imshow(interpolated_img, cmap="gray")
-plt.show()
-
-print("hi")

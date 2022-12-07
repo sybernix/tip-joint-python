@@ -20,11 +20,11 @@ def graph_denoise_interpolate(img):
     AT = A.transpose()
 
     H = np.zeros((m, m + n))
-    HT = H.transpose()
     H[0, 0] = 1
     H[1, 1] = 1
     H[2, 2] = 1
     H[3, 3] = 1
+    HT = H.transpose()
 
     temp = np.matmul(HT, H) + gamma * (np.matmul(HT, H) + np.matmul(np.matmul(np.matmul(AT, HT), H), A)
                                        - 2 * np.matmul(np.matmul(AT, HT), H)) + mu * np.matmul(np.matmul(HT, laplacian),

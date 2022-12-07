@@ -8,11 +8,11 @@ def interpolateGraphFilter(img):
     theta = np.array([[1/2, 1/2, 0, 0], [0, 0, 1/2, 1/2]])
     thetaT = theta.transpose()
     H = np.zeros((m, m + n))
-    HT = H.transpose()
     H[0, 0] = 1
     H[1, 1] = 1
     H[2, 2] = 1
     H[3, 3] = 1
+    HT = H.transpose()
     Amn = 2 * np.matmul(thetaT, np.linalg.pinv(np.matmul(theta, thetaT)))
     A = np.zeros((m + n, m + n))
     A[0:m, m:m+n] = Amn

@@ -3,9 +3,9 @@ import numpy as np
 from separable_graph_filter import graph_denoise_interpolate
 from avg_filter_noisy_img import avg_filter
 from theorem2.linear_interpolation import interpolateLinear
+from utils import get_project_root
 
-img_path = '../img/noisy_lena.png'
-
+img_path = str(get_project_root()) + "/img/noisy_lena.png"
 img = plt.imread(img_path)
 plt.imshow(img, cmap="gray")
 plt.show()

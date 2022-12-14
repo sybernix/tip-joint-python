@@ -1,6 +1,9 @@
 import numpy as np
+from utils import conjgrad
+from scipy.sparse import csc_matrix
+from scipy.sparse.linalg import cg
 
-def interpolateGraphFilter(img):
+def interpolateGraphFilter(img, use_cg=False):
     m = 4
     n = 2
     gamma = 0.4
@@ -21,6 +24,10 @@ def interpolateGraphFilter(img):
     temp = np.matmul(HT, H) + gamma * (np.matmul(HT, H) + np.matmul(np.matmul(np.matmul(AT, HT), H), A)
                                        - 2 * np.matmul(np.matmul(AT, HT), H))
 
+    if use_cg == False:
+        p = np.linalg.inv(temp)
+        q = np.matmul(p, HT)
+
     h, w = img.shape
     interpolated_img = np.zeros((h, 2 * w - 1))
 
@@ -31,10 +38,15 @@ def interpolateGraphFilter(img):
             img_patch = img[row:row+2, col:col+2]
             flattened_patch = np.reshape(img_patch, (4, 1))
 
-            p = np.linalg.pinv(temp)
-            q = np.matmul(p, HT)
+            b = np.matmul(HT, flattened_patch)
 
-            x = np.matmul(q, flattened_patch)
+            if use_cg ==  False:
+                x = np.matmul(q, flattened_patch)
+            else:
+                # x = conjgrad(temp, b, np.random.rand(len(temp[0]), 1))
+                x, exit_code = cg(temp, b)
+                x = np.reshape(x, (6, 1))
+
             interpolated_patch = x * (1 + gamma)
             interpolated_patch_reshaped = np.zeros((2, 3))
             interpolated_patch_reshaped[0, 0] = interpolated_patch[0, 0]

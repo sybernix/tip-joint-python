@@ -29,6 +29,9 @@ def graph_denoise_interpolate(img):
     temp = np.matmul(HT, H) + gamma * (np.matmul(HT, H) + np.matmul(np.matmul(np.matmul(AT, HT), H), A)
                                        - 2 * np.matmul(np.matmul(AT, HT), H)) + mu * np.matmul(np.matmul(HT, laplacian),
                                                                                                H)
+    p = np.linalg.pinv(temp)
+    p2 = np.linalg.inv(temp)
+    q = np.matmul(p, HT)
 
     h, w = img.shape
     filtered_img = np.zeros((h, 2 * w - 1))
@@ -39,9 +42,6 @@ def graph_denoise_interpolate(img):
             col = j
             img_patch = img[row:row + 2, col:col + 2]
             flattened_patch = np.reshape(img_patch, (4, 1))
-
-            p = np.linalg.pinv(temp)
-            q = np.matmul(p, HT)
 
             x = np.matmul(q, flattened_patch)
             interpolated_patch = x * (1 + gamma)

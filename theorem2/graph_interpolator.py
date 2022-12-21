@@ -38,12 +38,11 @@ def interpolateGraphFilter(img, use_cg=False):
             img_patch = img[row:row+2, col:col+2]
             flattened_patch = np.reshape(img_patch, (4, 1))
 
-            b = np.matmul(HT, flattened_patch)
-
             if use_cg ==  False:
                 x = np.matmul(q, flattened_patch)
             else:
                 # x = conjgrad(temp, b, np.random.rand(len(temp[0]), 1))
+                b = np.matmul(HT, flattened_patch)
                 x, exit_code = cg(temp, b)
                 x = np.reshape(x, (6, 1))
 

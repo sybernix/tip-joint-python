@@ -24,4 +24,4 @@ psi = np.full((m, m), 1 / m)
 mu = 0.5
 laplacian = (1 / mu) * (np.linalg.pinv(psi) - (1 + gamma) * np.identity(m))
 
-combined_laplacian = mu * np.matmul(np.matmul(HT, laplacian), H) + kappa *
+combined_laplacian = mu * np.matmul(np.matmul(HT, laplacian), H) + kappa * np.matmul(GT, )

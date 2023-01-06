@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from utils import get_project_root
-from numpy import matmul as mul
 from multiple_graph_interpolators import graph_multiple_interpolate
 from linear_interpolator import linear_multiple_interpolate
 

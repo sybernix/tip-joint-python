@@ -10,6 +10,12 @@ def graph_multiple_interpolate(img, m, n1, n2, gamma):
     H[3, 3] = 1
     HT = H.transpose()
 
+    H1 = H / np.sqrt(2)
+    H1T = H1.transpose()
+
+    H2 = H / np.sqrt(2)
+    H2T = H1.transpose()
+
     theta1 = np.array([[1 / 2, 1 / 2, 0, 0], [0, 0, 1 / 2, 1 / 2]])
     theta1T = theta1.transpose()
 
@@ -18,7 +24,7 @@ def graph_multiple_interpolate(img, m, n1, n2, gamma):
     A1[0:m, m:m + n1] = A1mn
     A1T = A1.transpose()
 
-    temp1 = mul(HT, H) - 2 * mul(mul(A1T, HT), H) + mul(mul(mul(A1T, HT), H), A1)
+    temp1 = mul(H1T, H1) - 2 * mul(mul(A1T, H1T), H1) + mul(mul(mul(A1T, H1T), H1), A1)
 
     theta2 = np.array([[0.5, 0, 0.5, 0], [0.25, 0.25, 0.25, 0.25], [0, 0.5, 0, 0.5]])
     theta2T = theta2.transpose()
@@ -28,7 +34,7 @@ def graph_multiple_interpolate(img, m, n1, n2, gamma):
     A2[0:m, m + n1:m + n1 + n2] = A2mn
     A2T = A2.transpose()
 
-    temp2 = mul(HT, H) - 2 * mul(mul(A2T, HT), H) + mul(mul(mul(A2T, HT), H), A2)
+    temp2 = mul(H2T, H2) - 2 * mul(mul(A2T, H2T), H2) + mul(mul(mul(A2T, H2T), H2), A2)
 
     coeff = mul(HT, H) + gamma * (temp1 + temp2)
     inv_coeff = np.linalg.pinv(coeff)

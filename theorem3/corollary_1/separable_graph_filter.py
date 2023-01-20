@@ -12,7 +12,7 @@ def graph_denoise_interpolate(img, psi, theta):
     #                 [0.247249820875324, 0.247335656093526, 0.278941892119199, 0.226472630911952],
     #                 [0.260255415738962, 0.278941892119199, 0.201335672588002, 0.259467019553837],
     #                 [0.179677806337726, 0.226472630911952, 0.259467019553837, 0.334382543196486]])
-    mu = 0.5
+    mu = 0.3
     laplacian = (1 / mu) * (np.linalg.inv(psi) - (1 + gamma) * np.identity(m))
 
     # initialize interpolator
@@ -37,12 +37,12 @@ def graph_denoise_interpolate(img, psi, theta):
     q = np.matmul(p, HT)
 
     h, w = img.shape
-    filtered_img = np.zeros((h, 2 * w - 1))
+    filtered_img = np.zeros((h, int(w + w/2)))
 
     for i in range(int(h / 2)):
-        for j in range(int(w - 1)):
+        for j in range(int(w / 2)):
             row = i * 2
-            col = j
+            col = j * 2
             img_patch = img[row:row + 2, col:col + 2]
             flattened_patch = np.reshape(img_patch, (4, 1))
 
@@ -55,5 +55,5 @@ def graph_denoise_interpolate(img, psi, theta):
             interpolated_patch_reshaped[1, 0] = interpolated_patch[2, 0]
             interpolated_patch_reshaped[1, 1] = interpolated_patch[5, 0]
             interpolated_patch_reshaped[1, 2] = interpolated_patch[3, 0]
-            filtered_img[row:row + 2, col + j:col + j + 3] = interpolated_patch_reshaped
+            filtered_img[row:row + 2, j * 3:j * 3 + 3] = interpolated_patch_reshaped
     return filtered_img

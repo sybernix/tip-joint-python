@@ -19,7 +19,7 @@ laplacian = (1 / mu) * (np.linalg.pinv(psi) - (1 + gamma) * np.identity(m))
 # initialize interpolator
 theta = np.array([[1 / 2, 1 / 2, 0, 0], [0, 0, 1 / 2, 1 / 2]])
 thetaT = theta.transpose()
-Amn = 2 * np.matmul(thetaT, np.linalg.pinv(np.matmul(theta, thetaT)))
+Amn = 2 * np.matmul(thetaT, np.linalg.inv(np.matmul(theta, thetaT)))
 A = np.zeros((m + n, m + n))
 A[0:m, m:m + n] = Amn
 AT = A.transpose()

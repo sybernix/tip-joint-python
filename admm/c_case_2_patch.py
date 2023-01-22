@@ -59,7 +59,7 @@ while not done:
     # update lamda
     lamda = lamda + rho * (x - z)
 
-    if np.sum(np.abs(x - z)) < 0.01:
+    if np.sum(np.abs(x - z)) < 0.001:
         done = True
 
 x_norm = x * (1+ gamma)

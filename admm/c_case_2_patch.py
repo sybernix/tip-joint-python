@@ -1,12 +1,13 @@
 import numpy as np
 from numpy import matmul as mul
 from numpy.linalg import inv as inv
+from scipy.sparse.linalg import cg
 
 m = 4           # num of original pixels
 n = 2           # num of interpolated pixels
 gamma = 0.4     # interpolator parameter
 kappa = 0.2     # denoiser parameter
-rho = 0.7       # ADMM parameter
+rho = 10       # ADMM parameter
 
 img_patch = np.array([[153, 156], [157, 158]])
 flattened_patch = np.reshape(img_patch, (4, 1))
@@ -50,16 +51,26 @@ while not done:
 
     # compute x
     coeff_x = mul(HT, H) + kappa * mul(mul(GT, Lbar), G) + (rho / 2) * np.identity(m + n)
-    x = mul(inv(coeff_x), (mul(HT, flattened_patch) - lamda/2 + (rho/2) * z))
+    # x = mul(inv(coeff_x), (mul(HT, flattened_patch) - lamda/2 + (rho/2) * z))
+    x, exit_code = cg(coeff_x, (mul(HT, flattened_patch) - lamda/2 + (rho/2) * z))
+    x = np.reshape(x, (6, 1))
+
+    if exit_code != 0:
+        print("x exit code not zero in iteration: " + str(iter))
 
     # compute z
     coeff_z = gamma * (mul(HT, H) + mul(mul(mul(AT, HT), H), A) - 2 * mul(mul(AT, HT), H)) + (rho / 2) * np.identity(m + n)
-    z = mul(inv(coeff_z), (lamda/2 + (rho/2) * x))
+    # z = mul(inv(coeff_z), (lamda/2 + (rho/2) * x))
+    z, exit_code_z = cg(coeff_z, (lamda/2 + (rho/2) * x))
+    z = np.reshape(z, (6, 1))
+
+    if exit_code_z != 0:
+        print("z exit code not zero in iteration: " + str(iter))
 
     # update lamda
     lamda = lamda + rho * (x - z)
 
-    if np.sum(np.abs(x - z)) < 0.001:
+    if np.sum(np.abs(x - z)) < 0.001 or iter > 10000:
         done = True
 
 x_norm = x * (1+ gamma)

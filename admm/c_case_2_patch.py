@@ -5,9 +5,9 @@ from scipy.sparse.linalg import cg
 
 m = 4           # num of original pixels
 n = 2           # num of interpolated pixels
-gamma = 0.4     # interpolator parameter
+gamma = 0.5     # interpolator parameter
 kappa = 0.2     # denoiser parameter
-rho = 10       # ADMM parameter
+rho = 1000       # ADMM parameter
 
 img_patch = np.array([[153, 156], [157, 158]])
 flattened_patch = np.reshape(img_patch, (4, 1))

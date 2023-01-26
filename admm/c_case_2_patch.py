@@ -37,14 +37,21 @@ Lbar = (inv(psi) - np.identity(n))/kappa
 
 # 3. compute linear system solution
 coeff_linear = mul(HT, H) + gamma * (mul(HT, H) + mul(mul(mul(AT, HT), H), A) - 2 * mul(mul(AT, HT), H)) + kappa * mul(mul(GT, Lbar), G)
-x0 = mul(mul(inv(coeff_linear), HT), flattened_patch) * (1 + gamma)
+# x0 = mul(mul(inv(coeff_linear), HT), flattened_patch) * (1 + gamma)
+
+M21 = coeff_linear[m:m+n, 0:m]
+M22 = coeff_linear[m:m+n, m:m+n] # M22 is SPD
+x01 = flattened_patch/(1+gamma)
+x02_, x02_exit_code = cg(M22, mul(-M21, x01))
+x02 = np.reshape(x02_, (n, 1))
+x0 = np.concatenate((x01, x02), axis=0) * (1+gamma)
 
 # 4. Implement ADMM iterations
 done = False
 iter = 0
 lamda = np.zeros((m + n, 1))
 coeff_m = mul(HT, H) + gamma * (mul(HT, H) + mul(mul(mul(AT, HT), H), A) - 2 * mul(mul(AT, HT), H))
-z = mul(mul(inv(coeff_m), HT), flattened_patch) * (1 + gamma)
+z = mul(mul(inv(coeff_m), HT), flattened_patch)
 
 while not done:
     iter = iter + 1
@@ -53,7 +60,7 @@ while not done:
     coeff_x = mul(HT, H) + kappa * mul(mul(GT, Lbar), G) + (rho / 2) * np.identity(m + n)
     # x = mul(inv(coeff_x), (mul(HT, flattened_patch) - lamda/2 + (rho/2) * z))
     x, exit_code = cg(coeff_x, (mul(HT, flattened_patch) - lamda/2 + (rho/2) * z))
-    x = np.reshape(x, (6, 1))
+    x = np.reshape(x, (m+n, 1))
 
     if exit_code != 0:
         print("x exit code not zero in iteration: " + str(iter))
@@ -61,8 +68,14 @@ while not done:
     # compute z
     coeff_z = gamma * (mul(HT, H) + mul(mul(mul(AT, HT), H), A) - 2 * mul(mul(AT, HT), H)) + (rho / 2) * np.identity(m + n)
     # z = mul(inv(coeff_z), (lamda/2 + (rho/2) * x))
-    z, exit_code_z = cg(coeff_z, (lamda/2 + (rho/2) * x))
-    z = np.reshape(z, (6, 1))
+    M21_z = coeff_z[m:m + n, 0:m]
+    M22_z = coeff_z[m:m + n, m:m + n]  # M22 is SPD
+    z01 = (lamda[0:m] / 2 + (rho/2) * x[0:m]) / (gamma + rho/2)
+    z02_, exit_code_z = cg(M22_z, mul(-M21_z, z01) + lamda[m:m+n]/2 + (rho/2) * x[m:m+n])
+    z02 = np.reshape(z02_, (n, 1))
+    z = np.concatenate((x01, x02), axis=0) * (1 + gamma)
+    # z, exit_code_z = cg(coeff_z, (lamda/2 + (rho/2) * x))
+    # z = np.reshape(z, (m+n, 1))
 
     if exit_code_z != 0:
         print("z exit code not zero in iteration: " + str(iter))

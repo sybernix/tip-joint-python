@@ -32,7 +32,7 @@ A[0:m, m:m + n] = Amn
 AT = A.transpose()
 
 # 2. Define denoiser
-psi = [[0.4375, 0.5625], [0.5625, 0.4375]]      # must be non-negative, symmetric, doubly-stochastic, invertible
+psi = [[0.8, 0.2], [0.2, 0.8]]      # must be non-negative, symmetric, doubly-stochastic, invertible
 Lbar = (inv(psi) - np.identity(n))/kappa
 
 # 3. compute linear system solution
@@ -73,7 +73,7 @@ while not done:
     z01 = (lamda[0:m] / 2 + (rho/2) * x[0:m]) / (gamma + rho/2)
     z02_, exit_code_z = cg(M22_z, mul(-M21_z, z01) + lamda[m:m+n]/2 + (rho/2) * x[m:m+n])
     z02 = np.reshape(z02_, (n, 1))
-    z = np.concatenate((x01, x02), axis=0) * (1 + gamma)
+    z = np.concatenate((x01, x02), axis=0)
     # z, exit_code_z = cg(coeff_z, (lamda/2 + (rho/2) * x))
     # z = np.reshape(z, (m+n, 1))
 

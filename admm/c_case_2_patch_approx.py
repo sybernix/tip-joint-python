@@ -58,7 +58,8 @@ coeff_z[:m, :m] = np.identity(m) / gamma
 coeff_z[m:m+n, :m] = theta / gamma
 coeff_z[m:m+n, m:m+n] = mul(theta, thetaT) / (4 * gamma)
 
-x = np.zeros((m+n, 1)) + 1
+# x = np.zeros((m+n, 1)) + 1
+x = z
 
 while not done:
     iter = iter + 1

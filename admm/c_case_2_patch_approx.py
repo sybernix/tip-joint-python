@@ -5,8 +5,8 @@ from scipy.sparse.linalg import cg
 
 m = 4           # num of original pixels
 n = 2           # num of interpolated pixels
-gamma = 0.5     # interpolator parameter
-kappa = 0.2     # denoiser parameter
+gamma = 0.4     # interpolator parameter
+kappa = 0.5     # denoiser parameter
 rho = 1000       # ADMM parameter
 
 img_patch = np.array([[153, 156], [157, 158]])
@@ -65,7 +65,7 @@ while not done:
     iter = iter + 1
 
     # compute x
-    x_m = (1/ (1 + rho/2)) * (flattened_patch - lamda[:m] + (rho/2) * z[:m])
+    x_m = (1/ (1 + rho/2)) * (flattened_patch - lamda[:m]/2 + (rho/2) * z[:m])
     x_n = mul(psi, (-lamda[m:m+n]/2 + (rho/2) * z[m:m+n] + (1 - rho/2) * x[m:m+n]))
     x = np.concatenate((x_m, x_n), axis=0)
 

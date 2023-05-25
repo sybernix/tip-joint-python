@@ -20,6 +20,10 @@ linear_interpolated_img = interpolateLinear(img)
 plt.imshow(linear_interpolated_img, cmap="gray")
 plt.show()
 
+exp_dir = "/Users/niruhan/Documents/source_codes/tip-joint-python/exp_outs/6/"
+plt.imsave(exp_dir + "linear_out.png", linear_interpolated_img, cmap="gray")
+plt.imsave(exp_dir + "graph_out.png", graph_interpolated_img, cmap="gray")
+
 ssd = np.sum((graph_interpolated_img - linear_interpolated_img) ** 2)
 
 print(ssd)

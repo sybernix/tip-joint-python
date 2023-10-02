@@ -3,7 +3,7 @@ from utils import conjgrad
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import cg
 
-def interpolateGraphFilter(img, use_cg=False):
+def interpolateGraphFilter(img, use_cg=True):
     m = 4
     n = 2
     gamma = 0.4

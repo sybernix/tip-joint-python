@@ -57,11 +57,11 @@ g = gaussianFilter(kernel_size, sigma)
 p_h = 10
 p_w = 10
 
-for row in range(0, h, p_h):
+for row in range(0, h - (h % p_h), p_h):
     psv = row
     pev = row + p_h
 
-    for col in range(0, w, p_w):
+    for col in range(0, w - (w % p_w), p_w):
         psh = col
         peh = col + p_w
 
@@ -108,7 +108,9 @@ for row in range(0, h, p_h):
         N = M
 
         psi = preparePsi(g, y_max - y_min, x_max - x_min, kernel_halfwidth)
+        psi = ot.sinkhorn(a=np.ones(psi.shape[0]), b=np.ones(psi.shape[1]), M=psi, reg=1e-3)
         psi_bar = preparePsi(g, p_h, p_w, kernel_halfwidth)
+        psi_bar = ot.sinkhorn(a=np.ones(psi_bar.shape[0]), b=np.ones(psi_bar.shape[1]), M=psi_bar, reg=0.1)
 
         output_flat = np.dot(np.dot(psi_bar, theta), y_flat)
         output_mat = output_flat.reshape(p_h, p_w)
@@ -129,9 +131,10 @@ for row in range(0, h, p_h):
         psi_bar_full[:p_h * p_w, :p_h * p_w] = psi_bar
         rans_psi_comp = np.random.rand(M - p_h * p_w, M - p_h * p_w)
         rans_psi_comp = rans_psi_comp @ rans_psi_comp.T
+        rans_psi_comp = ot.sinkhorn(a=np.ones(rans_psi_comp.shape[0]), b=np.ones(rans_psi_comp.shape[1]), M=rans_psi_comp, reg=0.1)
         psi_bar_full[p_h * p_w:, p_h * p_w:] = rans_psi_comp
 
-        psi_bar_full = ot.sinkhorn(a=np.ones(psi_bar_full.shape[0]), b=np.ones(psi_bar_full.shape[1]), M=psi_bar_full, reg=1e-3)
+        # psi_bar_full = ot.sinkhorn(a=np.ones(psi_bar_full.shape[0]), b=np.ones(psi_bar_full.shape[1]), M=psi_bar_full, reg=1e-3)
 
         L = (np.linalg.inv(psi) - np.eye(M)) / mu
         Lbar = (np.linalg.inv(psi_bar_full) - np.eye(N)) / kappa

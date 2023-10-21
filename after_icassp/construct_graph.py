@@ -21,14 +21,15 @@ def getXYMaps(originalImage, angle_degrees):
     return x_rot, y_rot
 
 # Define image dimensions
-width = 10
-height = 10
+p_w = 10
+p_h = 10
+angle_degrees = 20
 
 # Create a 10x10 matrix filled with ones (white)
-img_patch = np.ones((height, width))
+img_patch = np.ones((p_h, p_w))
 
 # Set the left half to black (zero)
-img_patch[:, :width//2] = 0
+img_patch[:, :p_w // 2] = 0
 
 # Display the image patch
 plt.imshow(img_patch, cmap='gray')
@@ -45,3 +46,42 @@ noisy_img_patch = np.clip(noisy_img_patch, 0, 1)
 # Display the noisy image patch
 plt.imshow(noisy_img_patch, cmap='gray')
 plt.show()
+
+mapx, mapy = getXYMaps(noisy_img_patch, angle_degrees)
+
+x_min = int(np.floor(mapx.min()))
+y_min = int(np.floor(mapy.min()))
+
+x_max = int(np.ceil(mapx.max()))
+y_max = int(np.ceil(mapy.max()))
+
+img_patch = noisy_img_patch[y_min:y_max, x_min:x_max]
+ip_h, ip_w = img_patch.shape
+
+theta = np.zeros((p_h * p_w, ip_h * ip_w))
+
+for i in range(p_h):
+    for j in range(p_w):
+        theta_r = i * p_w + j
+
+        x = mapx[i, j]  - x_min
+        y = mapy[i, j] - y_min
+
+        l = int(np.floor(x))
+        t = int(np.floor(y))
+
+        a = x - l
+        b = y - t
+
+        theta_lt_loc = (t - 1) * ip_w + l
+        theta_rt_loc = theta_lt_loc + 1
+
+        theta_lb_loc = t * ip_w + l
+        theta_rb_loc = theta_lb_loc + 1
+
+        theta[theta_r, theta_lt_loc] = (1 - b) * (1 - a)
+        theta[theta_r, theta_rt_loc] = (1 - b) * a
+        theta[theta_r, theta_lb_loc] = b * (1 - a)
+        theta[theta_r, theta_rb_loc] = b * a
+
+a = 1

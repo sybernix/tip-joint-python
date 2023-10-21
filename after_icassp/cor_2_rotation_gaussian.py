@@ -54,14 +54,14 @@ kernel_halfwidth = 1
 kernel_size = 2 * kernel_halfwidth + 1
 g = gaussianFilter(kernel_size, sigma)
 
-p_h = 10
-p_w = 10
+p_h = 5
+p_w = 5
 
-for row in range(0, h - (h % p_h), p_h):
+for row in range(50, h - (h % p_h), p_h):
     psv = row
     pev = row + p_h
 
-    for col in range(0, w - (w % p_w), p_w):
+    for col in range(50, w - (w % p_w), p_w):
         psh = col
         peh = col + p_w
 
@@ -146,10 +146,14 @@ for row in range(0, h - (h % p_h), p_h):
         I = np.eye(M + N)
         L_comb = mu * H.T @ L @ H + kappa * G.T @ Lbar @ G
         C = H.T @ H + gamma * (I - A).T @ H.T @ H @ (I - A) + L_comb
-
-        x, _ = cg(C, H.T @ y_flat, tol=1e-6, maxiter=3000)
-        output_mat_graph = x[M:M + p_h * p_w].reshape(p_h, p_w)
+        C_inv = np.linalg.inv(C)
+        # x, _ = cg(C, H.T @ y_flat, tol=1e-6, maxiter=3000)
+        x_inv = C_inv @ H.T @ y_flat
+        output_mat_graph = x_inv[M:M + p_h * p_w].reshape(p_h, p_w)
         graph_output[psv:pev, psh:peh] = output_mat_graph
+
+plt.imshow(graph_output, cmap='gray')
+plt.show()
 
 groundtruth = rotate(img, angle_degrees, mode='nearest', reshape=False)
 graph_psnr_value = psnr(graph_output, groundtruth)
@@ -162,5 +166,4 @@ seq_ssim_value = ssim(seq_out, groundtruth)
 
 ssim_gain = graph_ssim_value - seq_ssim_value
 
-plt.imshow(graph_output)
-plt.show()
+
